@@ -294,18 +294,20 @@ api = Api(app)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-API_KEY = "RGAPI-52b59041-06ff-4882-9e4a-d5a431b7182d"
+API_KEY = "RGAPI-01207cb3-453f-4967-bdc9-7d4d6c979f1d"
 
 
 class Summoner(Resource):
     # @cross_origin()
     def get(self, nick,server):
         response = requests.get(
-            'https://'+server+'.api.riotgames.com/lol/summoner/v4/summoners/by-name/' + nick + '?api_key=' + API_KEY)
+            'https://'+server+'.api.riotgames.com/lol/summoner/v4/summoners/by-name/' + nick +
+            '?api_key=' + API_KEY)
         id = response.json()['id']
 
         response = requests.get(
-            'https://'+server+'.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/' + id + '?api_key=' + API_KEY)
+            'https://'+server+'.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-'
+                              'summoner/' + id + '?api_key=' + API_KEY)
 
         played = [] #champions ids
         not_played = []
@@ -330,8 +332,8 @@ class Summoner(Resource):
                 not_played.append(i)
 
         rotation_champions = requests.get(
-            'https://'+server+'.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=' + API_KEY).json().get(
-            "freeChampionIds")
+            'https://'+server+'.api.riotgames.com/lol/platform/v3/champion-rotations?api_key='
+            + API_KEY).json().get("freeChampionIds")
         rotation_champions_not_played = []
         rotation_champions_not_played_names = []
         for i in rotation_champions:
@@ -346,16 +348,24 @@ class Summoner(Resource):
                 rotation_champions_not_played_names.append(k)
 
         response = requests.get(
-            'https://'+server+'.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/' + id + '?api_key=' + API_KEY)
+            'https://'+server+'.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/' +
+            id +
+            '?api_key=' + API_KEY)
         score = response.json()
 
         response = requests.get(
-            'https://'+server+'.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/' + id + '?api_key=' + API_KEY)
+            'https://'+server+'.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/' +
+            id + '?api_key=' + API_KEY)
         is_playing = False
         if (response.status_code == 200):
             is_playing = True
 
         return {
+            "champion_points": champion_points,
+            "chest_granted": chest_granted,
+            "champion_levels": champion_levels,
+            "champion_points_since_last_level": champion_points_since_last_level,
+            "champion_points_until_next_level": champion_points_until_next_level,
             "is_playing": is_playing,
             "not_played_count": len(not_played_champions),
             "id": id,
@@ -367,16 +377,7 @@ class Summoner(Resource):
         }
 
 
-#
-# class Rotation(Resource):
-#     def get(self, name):
-#         response = requests.get('https://+'srv'+.api.riotgames.com/lol/platform/v3/champion-rotations?api_key='+ API_KEY)
-#         return response.json().get("freeChampionIds")
-
-
 api.add_resource(Summoner, '/summoner/<string:server>/<string:nick>')
-# api.add_resource(Rotation, '/rotation/<string:name>')
-
 
 if __name__ == '__main__':
     app.run()
