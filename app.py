@@ -294,7 +294,7 @@ api = Api(app)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-API_KEY = "RGAPI-01207cb3-453f-4967-bdc9-7d4d6c979f1d"
+API_KEY = "RGAPI-45f9572f-166c-43f2-9dc6-92ebfee4c87e"
 
 
 class Summoner(Resource):
@@ -317,6 +317,8 @@ class Summoner(Resource):
         chest_granted = [] #boolean
         champion_points_since_last_level = []
         champion_points_until_next_level = []
+        champion_played = []
+        champion_played_dict = []
 
         for i in response.json():
             played.append(str(i["championId"]))
@@ -330,6 +332,14 @@ class Summoner(Resource):
         for i in ids:
             if (not i in played):
                 not_played.append(i)
+
+        for champion_id in played:
+            name = ""
+            for k, v in champions.items():
+                if(v == champion_id):
+                    name = k
+                    break
+            champion_played.append(name)
 
         rotation_champions = requests.get(
             'https://'+server+'.api.riotgames.com/lol/platform/v3/champion-rotations?api_key='
@@ -360,12 +370,21 @@ class Summoner(Resource):
         if (response.status_code == 200):
             is_playing = True
 
+        for i in range(len(champion_played)):
+            champion_played_dict.append(
+                {
+                    "name": champion_played[i],
+                    "points": champion_points[i],
+                    "level": champion_levels[i],
+                }
+            )
+
         return {
-            "champion_points": champion_points,
-            "chest_granted": chest_granted,
-            "champion_levels": champion_levels,
-            "champion_points_since_last_level": champion_points_since_last_level,
-            "champion_points_until_next_level": champion_points_until_next_level,
+            # "champion_points": champion_points,
+            # "chest_granted": chest_granted,
+            # "champion_levels": champion_levels,
+            # "champion_points_since_last_level": champion_points_since_last_level,
+            # "champion_points_until_next_level": champion_points_until_next_level,
             "is_playing": is_playing,
             "not_played_count": len(not_played_champions),
             "id": id,
@@ -373,7 +392,8 @@ class Summoner(Resource):
             "real_score": score + len(not_played_champions),
             "champions": not_played_champions,
             "rotation_champions_not_played": rotation_champions_not_played_names,
-            "summary_points": summary_points
+            "summary_points": summary_points,
+            "champion_played": champion_played_dict
         }
 
 

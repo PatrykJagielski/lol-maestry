@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Lol from './components/Lol'
 
 class App extends Component {
     constructor(){
@@ -17,7 +18,8 @@ class App extends Component {
             champion_levels: [],
             champion_points_since_last_level: [],
             champion_points_until_next_level: [],
-            summary_points: 0
+            summary_points: 0,
+            champion_played: []
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -34,8 +36,10 @@ class App extends Component {
         event.stopPropagation()
         const url = 'http://localhost:5000/summoner/eun1/' + this.state.summonerName
         fetch(url)
-            .then(response => response.json())
-            // .then(parsedJSON => console.log(parsedJSON))
+            .then((response) => {
+                if(response.ok) return response.json()
+                else throw new Error(response.status)
+            })
             .then(parsedJSON => {
                 return this.setState({
                     score: parsedJSON["score"],
@@ -45,12 +49,13 @@ class App extends Component {
                     notPlayedCount: parsedJSON["not_played_count"],
                     rotationChampions: parsedJSON["rotation_champions_not_played"],
                     champions: parsedJSON["champions"],
-                    champion_points: parsedJSON["champion_points"],
-                    chest_granted: parsedJSON["chest_granted"],
-                    champion_levels: parsedJSON["champion_levels"],
-                    champion_points_since_last_level: parsedJSON["champion_points_since_last_level"],
-                    champion_points_until_next_level: parsedJSON["champion_points_until_next_level"],
-                    summary_points: parsedJSON["summary_points"]
+                    // champion_points: parsedJSON["champion_points"],
+                    // chest_granted: parsedJSON["chest_granted"],
+                    // champion_levels: parsedJSON["champion_levels"],
+                    // champion_points_since_last_level: parsedJSON["champion_points_since_last_level"],
+                    // champion_points_until_next_level: parsedJSON["champion_points_until_next_level"],
+                    summary_points: parsedJSON["summary_points"],
+                    champion_played: parsedJSON["champion_played"]
                 });
             })
             .catch(error => console.log(error))
@@ -69,15 +74,8 @@ class App extends Component {
                     />
                     <input type="submit" value="Submit" />
                 </form>
-
                 <br />
-                <p>maesrty score: {this.state.score}</p>
-                <p>real maestry score: {this.state.realScore}</p>
-                <p>summary maestry points: {this.state.summary_points}</p>
-                <p>champions not played: {this.state.notPlayedCount} <br/>
-                    {this.state.champions.map(function (name,index) {
-                        return <div>{index+1} {name}</div>;
-                    })}</p>
+                <Lol lol={this.state} />
             </div>
         );
     }
