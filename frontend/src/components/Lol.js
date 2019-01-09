@@ -6,14 +6,14 @@ class Lol extends Component {
     render() {
         return (
             <div>
-                <p>mastery score: {this.props.lol.score}</p>
-                <p>real mastery score: {this.props.lol.realScore}</p>
-                <p>summary mastery points: {this.props.lol.summary_points}</p>
+                mastery score: {this.props.lol.score}<br/>
+                real mastery score: {this.props.lol.realScore}<br/>
+                summary mastery points: {this.props.lol.summary_points}<br/>
                 <ChampionsLevels champions={this.props.lol} />
-                <p>champions not played: {this.props.lol.notPlayedCount} <br/>
+                champions not played: {this.props.lol.notPlayedCount} <br/>
                     {this.props.lol.champions.map(function (name,index) {
                         return <div>{index+1} {name}</div>;
-                    })}</p>
+                    })}
             </div>
         );
     }

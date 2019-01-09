@@ -294,7 +294,7 @@ api = Api(app)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-API_KEY = "RGAPI-45f9572f-166c-43f2-9dc6-92ebfee4c87e"
+API_KEY = "RGAPI-6568bde6-aa8c-468b-a9d8-5bd4a89d405a"
 
 
 class Summoner(Resource):
